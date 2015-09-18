@@ -31,10 +31,7 @@
         center: {lat: 24.9375, lng: 60.1708},
         zoom: 12
       });
-      locate();
-    }
-    
-    function locate() {
+      
     	if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
           var pos = {
