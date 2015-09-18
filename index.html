@@ -25,35 +25,7 @@
 // prompted by your browser. If you see the error "The Geolocation service
 // failed.", it means you probably did not give permission for the browser to
 // locate you.
-    function CenterControl(controlDiv, map) {
 
-  // Set CSS for the control border.
-  	var controlUI = document.createElement('div');
-  	controlUI.style.backgroundColor = '#fff';
-  	controlUI.style.border = '2px solid #fff';
-  	controlUI.style.borderRadius = '3px';
-  	controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
-  	controlUI.style.cursor = 'pointer';
-  	controlUI.style.marginBottom = '22px';
-  	controlUI.style.textAlign = 'center';
-  	controlUI.title = 'Click to recenter the map';
-  	controlDiv.appendChild(controlUI);
-
-  // Set CSS for the control interior.
-  	var controlText = document.createElement('div');
-  	controlText.style.color = 'rgb(25,25,25)';
-  	controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
-  	controlText.style.fontSize = '16px';
-  	controlText.style.lineHeight = '38px';
-  	controlText.style.paddingLeft = '5px';
-  	controlText.style.paddingRight = '5px';
-  	controlText.innerHTML = 'Center Map';
-  	controlUI.appendChild(controlText);
-
-  // Setup the click event listeners: simply set the map to Chicago.
-  	controlUI.addEventListener('click', function() {
-    	map.setCenter(pos);
-  });
     function initMap() {
       var map = new google.maps.Map(document.getElementById('map'), {
         center: {lat: 24.9375, lng: 60.1708},
@@ -92,6 +64,35 @@
                             'Error: The Geolocation service failed.' :
                             'Error: Your browser doesn\'t support geolocation.');
     }
+        function CenterControl(controlDiv, map) {
+
+  // Set CSS for the control border.
+  	var controlUI = document.createElement('div');
+  	controlUI.style.backgroundColor = '#fff';
+  	controlUI.style.border = '2px solid #fff';
+  	controlUI.style.borderRadius = '3px';
+  	controlUI.style.boxShadow = '0 2px 6px rgba(0,0,0,.3)';
+  	controlUI.style.cursor = 'pointer';
+  	controlUI.style.marginBottom = '22px';
+  	controlUI.style.textAlign = 'center';
+  	controlUI.title = 'Click to recenter the map';
+  	controlDiv.appendChild(controlUI);
+
+  // Set CSS for the control interior.
+  	var controlText = document.createElement('div');
+  	controlText.style.color = 'rgb(25,25,25)';
+  	controlText.style.fontFamily = 'Roboto,Arial,sans-serif';
+  	controlText.style.fontSize = '16px';
+  	controlText.style.lineHeight = '38px';
+  	controlText.style.paddingLeft = '5px';
+  	controlText.style.paddingRight = '5px';
+  	controlText.innerHTML = 'Center Map';
+  	controlUI.appendChild(controlText);
+
+  // Setup the click event listeners: simply set the map to Chicago.
+  	controlUI.addEventListener('click', function() {
+    	map.setCenter(pos);
+  	});
 
     </script>
     
