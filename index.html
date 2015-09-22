@@ -47,7 +47,7 @@
     <script>
     
 var map;
-var chicago = {lat: 41.85, lng: -87.65};
+var helsinki = {lat: 60.192059, lng: -24.945831};
 
 
 /**
@@ -187,7 +187,7 @@ CenterControl.prototype.setCenter = function(center) {
         handleLocationError(false, infoWindow, map.getCenter());
       }
   var centerControlDiv = document.createElement('div');
-  var centerControl = new CenterControl(centerControlDiv, map, chicago);
+  var centerControl = new CenterControl(centerControlDiv, map, helsinki);
 
   centerControlDiv.index = 1;
   centerControlDiv.style['padding-top'] = '10px';
