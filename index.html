@@ -79,6 +79,29 @@ function CenterControl(controlDiv, map, center) {
     control.setCenter(newCenter);
   });
 }
+
+/**
+ * Define a property to hold the center state.
+ * @private
+ */
+CenterControl.prototype.center_ = null;
+
+/**
+ * Gets the map center.
+ * @return {?google.maps.LatLng}
+ */
+CenterControl.prototype.getCenter = function() {
+  return this.center_;
+};
+
+/**
+ * Sets the map center.
+ * @param {?google.maps.LatLng} center
+ */
+CenterControl.prototype.setCenter = function(center) {
+  this.center_ = center;
+};
+
 // Note: This example requires that you consent to location sharing when
 // prompted by your browser. If you see the error "The Geolocation service
 // failed.", it means you probably did not give permission for the browser to
@@ -145,6 +168,7 @@ function CenterControl(controlDiv, map, center) {
   centerControlDiv.index = 1;
   centerControlDiv.style['padding-top'] = '10px';
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+
     	
     }
     
