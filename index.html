@@ -24,6 +24,7 @@
     
 var map;
 var chicago = {lat: 41.85, lng: -87.65};
+var infoWindow = new google.maps.InfoWindow({map: map});
 
 /**
  * The CenterControl adds a control to the map that recenters the map on
@@ -36,7 +37,24 @@ var chicago = {lat: 41.85, lng: -87.65};
 function CenterControl(controlDiv, map, center) {
   // We set up a variable for this since we're adding event listeners later.
   var control = this;
+  // get location
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      };
 
+      infoWindow.setPosition(pos);
+      infoWindow.setContent('Location found.');
+      map.setCenter(pos);
+    }, function() {
+      handleLocationError(true, infoWindow, map.getCenter());
+    });
+  } else {
+    // Browser doesn't support Geolocation
+    handleLocationError(false, infoWindow, map.getCenter());
+  }
   // Set the center property upon construction
   control.center_ = center;
   controlDiv.style.clear = 'both';
