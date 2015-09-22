@@ -220,6 +220,14 @@ CenterControl.prototype.getLocation = function(center) {
   centerControlDiv.index = 1;
   centerControlDiv.style['padding-top'] = '10px';
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+  var Message = 'Olet täällä'
+          var myLatlng = {helsinki};
+          var marker = new google.maps.Marker({
+    		position: myLatlng,
+    		map: map,
+    		title: 'Click to zoom'
+          });
+          attachSecretMessage(marker, Message)
 
     	
     }
