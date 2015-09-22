@@ -171,14 +171,11 @@ CenterControl.prototype.setCenter = function(center) {
       // Try HTML5 geolocation.
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
-          var pos = {
-            lat: position.coords.latitude,
-            lng: position.coords.longitude
-          };
+          var helsinki = { lat: position.coords.latitude, lng: position.coords.longitude };
     
-          infoWindow.setPosition(pos);
+          infoWindow.setPosition(helsinki);
           infoWindow.setContent('Olet tässä!');
-          map.setCenter(pos);
+          map.setCenter(helsinki);
         }, function() {
           handleLocationError(true, infoWindow, map.getCenter());
         });
