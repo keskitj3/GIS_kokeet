@@ -187,7 +187,7 @@ CenterControl.prototype.setCenter = function(center) {
         handleLocationError(false, infoWindow, map.getCenter());
       }
   var centerControlDiv = document.createElement('div');
-  var centerControl = new CenterControl(centerControlDiv, map, pos);
+  var centerControl = new CenterControl(centerControlDiv, map, chicago);
 
   centerControlDiv.index = 1;
   centerControlDiv.style['padding-top'] = '10px';
