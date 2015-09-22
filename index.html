@@ -92,8 +92,8 @@ function CenterControl(controlDiv, map, center) {
   // Set up the click event listener for 'Center Map': Set the center of the map
   // to the current center of the control.
   goCenterUI.addEventListener('click', function() {
-    var currentCenter = control.getCenter();
-    map.setCenter(currentCenter);
+    var currentLocation = control.getCenter();
+    map.getLocation(currentLocation);
   });
 
   // Set up the click event listener for 'Set Center': Set the center of the
