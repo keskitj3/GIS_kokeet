@@ -22,7 +22,7 @@
     <div id="map"></div>
     <script>
     
-    var map;
+var map;
 var chicago = {lat: 41.85, lng: -87.65};
 
 /**
@@ -139,6 +139,13 @@ function CenterControl(controlDiv, map, center) {
         // Browser doesn't support Geolocation
         handleLocationError(false, infoWindow, map.getCenter());
       }
+  var centerControlDiv = document.createElement('div');
+  var centerControl = new CenterControl(centerControlDiv, map, chicago);
+
+  centerControlDiv.index = 1;
+  centerControlDiv.style['padding-top'] = '10px';
+  map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
+    	
     }
     
     function handleLocationError(browserHasGeolocation, infoWindow, pos) {
