@@ -109,6 +109,7 @@ function CenterControl(controlDiv, map, center) {
     		title: 'Click to zoom'
           });
           map.setCenter(helsinki);
+          map.setZoom(7);
           control.getLocation(helsinki);
         }, function() {
           handleLocationError(true, infoWindow, map.getCenter());
