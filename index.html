@@ -102,6 +102,7 @@ function CenterControl(controlDiv, map, center) {
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(function(position) {
           var helsinki = { lat: position.coords.latitude, lng: position.coords.longitude };
+          var myLatlng = helsinki
           map.setCenter(helsinki);
           control.getLocation(helsinki);
         }, function() {
@@ -175,24 +176,24 @@ CenterControl.prototype.getLocation = function(center) {
 
   map.mapTypes.set(customMapTypeId, customMapType);
   map.setMapTypeId(customMapTypeId)
-  var infoWindow = new google.maps.InfoWindow({map: map});
-
+//  var infoWindow = new google.maps.InfoWindow({map: map});
+  map.setCenter(helsinki);
 			
       // Try HTML5 geolocation.
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
-          var helsinki = { lat: position.coords.latitude, lng: position.coords.longitude };
-    
-          infoWindow.setPosition(helsinki);
-          infoWindow.setContent('Olet tässä!');
-          map.setCenter(helsinki);
-        }, function() {
-          handleLocationError(true, infoWindow, map.getCenter());
-        });
-      } else {
+//      if (navigator.geolocation) {
+//        navigator.geolocation.getCurrentPosition(function(position) {
+//          var helsinki = { lat: position.coords.latitude, lng: position.coords.longitude };
+//    
+//          infoWindow.setPosition(helsinki);
+//          infoWindow.setContent('Olet tässä!');
+//          map.setCenter(helsinki);
+//        }, function() {
+//          handleLocationError(true, infoWindow, map.getCenter());
+//        });
+//      } else {
         // Browser doesn't support Geolocation
-        handleLocationError(false, infoWindow, map.getCenter());
-      }
+//        handleLocationError(false, infoWindow, map.getCenter());
+//      }
   var centerControlDiv = document.createElement('div');
   var centerControl = new CenterControl(centerControlDiv, map, helsinki);
 
