@@ -37,24 +37,6 @@ var infoWindow = new google.maps.InfoWindow({map: map});
 function CenterControl(controlDiv, map, center) {
   // We set up a variable for this since we're adding event listeners later.
   var control = this;
-  // get location
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var pos = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-
-      infoWindow.setPosition(pos);
-      infoWindow.setContent('Location found.');
-      map.setCenter(pos);
-    }, function() {
-      handleLocationError(true, infoWindow, map.getCenter());
-    });
-  } else {
-    // Browser doesn't support Geolocation
-    handleLocationError(false, infoWindow, map.getCenter());
-  }
   // Set the center property upon construction
   control.center_ = center;
   controlDiv.style.clear = 'both';
@@ -160,28 +142,28 @@ CenterControl.prototype.setCenter = function(center) {
   map.setMapTypeId(customMapTypeId)
 			
       // Try HTML5 geolocation.
-//      if (navigator.geolocation) {
-//        navigator.geolocation.getCurrentPosition(function(position) {
-//          var pos = {
-//            lat: position.coords.latitude,
-//            lng: position.coords.longitude
-//          };
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(function(position) {
+          var pos = {
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          };
     
-//          infoWindow.setPosition(pos);
-//          infoWindow.setContent('Olet tässä!');
-//          map.setCenter(pos);
-//        }, function() {
-//          handleLocationError(true, infoWindow, map.getCenter());
-//        });
-//      } else {
+          infoWindow.setPosition(pos);
+          infoWindow.setContent('Olet tässä!');
+          map.setCenter(pos);
+        }, function() {
+          handleLocationError(true, infoWindow, map.getCenter());
+        });
+      } else {
         // Browser doesn't support Geolocation
-//        handleLocationError(false, infoWindow, map.getCenter());
-//      }
+        handleLocationError(false, infoWindow, map.getCenter());
+      }
   var centerControlDiv = document.createElement('div');
-  var centerControl = new CenterControl(centerControlDiv, map, chicago);
+  var centerControl = new CenterControl(centerControlDiv, map, pos);
 
-  centerControlDiv.index = 1;
-  centerControlDiv.style['padding-top'] = '10px';
+  centerControlDiv.index = 12;
+  centerControlDiv.style['padding-top'] = '20px';
   map.controls[google.maps.ControlPosition.TOP_CENTER].push(centerControlDiv);
 
     	
