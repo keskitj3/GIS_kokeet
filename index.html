@@ -106,9 +106,7 @@ CenterControl.prototype.setCenter = function(center) {
 // locate you.
 
     function initMap() {
-    	var map;
-	var chicago = {lat: 41.85, lng: -87.65};
-	var infoWindow = new google.maps.InfoWindow({map: map});
+    	
       var customMapType = new google.maps.StyledMapType([
       {
         stylers: [
@@ -141,6 +139,10 @@ CenterControl.prototype.setCenter = function(center) {
 
   map.mapTypes.set(customMapTypeId, customMapType);
   map.setMapTypeId(customMapTypeId)
+  var map;
+  var chicago = {lat: 41.85, lng: -87.65};
+  var infoWindow = new google.maps.InfoWindow({map: map});
+
 			
       // Try HTML5 geolocation.
       if (navigator.geolocation) {
