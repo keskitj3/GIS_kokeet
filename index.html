@@ -46,6 +46,8 @@
     <div id="map"></div>
     <script>
     
+var map;
+var chicago = {lat: 41.85, lng: -87.65};
 
 
 /**
@@ -163,8 +165,6 @@ CenterControl.prototype.setCenter = function(center) {
 
   map.mapTypes.set(customMapTypeId, customMapType);
   map.setMapTypeId(customMapTypeId)
-  var map;
-  var chicago = {lat: 41.85, lng: -87.65};
   var infoWindow = new google.maps.InfoWindow({map: map});
 
 			
