@@ -74,20 +74,20 @@ function CenterControl(controlDiv, map, center) {
   // Set CSS for the control interior
   var goCenterText = document.createElement('div');
   goCenterText.id = 'goCenterText';
-  goCenterText.innerHTML = 'Center Map';
+  goCenterText.innerHTML = 'Keskitä';
   goCenterUI.appendChild(goCenterText);
 
   // Set CSS for the setCenter control border
-  var setCenterUI = document.createElement('div');
-  setCenterUI.id = 'setCenterUI';
-  setCenterUI.title = 'Click to change the center of the map';
-  controlDiv.appendChild(setCenterUI);
+  var getLocationUI = document.createElement('div');
+  getLocationUI.id = 'getLocationUI';
+  getLocationUI.title = 'Click to get the location';
+  controlDiv.appendChild(getLocationUI);
 
   // Set CSS for the control interior
-  var setCenterText = document.createElement('div');
-  setCenterText.id = 'setCenterText';
-  setCenterText.innerHTML = 'Set Center';
-  setCenterUI.appendChild(setCenterText);
+  var getLocationText = document.createElement('div');
+  getLocationText.id = 'getLocationText';
+  getLocationText.innerHTML = 'Paikanna';
+  getLocationUI.appendChild(getLocationText);
 
   // Set up the click event listener for 'Center Map': Set the center of the map
   // to the current center of the control.
@@ -98,9 +98,9 @@ function CenterControl(controlDiv, map, center) {
 
   // Set up the click event listener for 'Set Center': Set the center of the
   // control to the current center of the map.
-  setCenterUI.addEventListener('click', function() {
-    var newCenter = map.getCenter();
-    control.setCenter(newCenter);
+  getLocationUI.addEventListener('click', function() {
+    var newLocation = map.getCenter();
+    control.getLocation(newLocation);
   });
 }
 
