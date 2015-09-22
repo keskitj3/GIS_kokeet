@@ -125,9 +125,9 @@ function CenterControl(controlDiv, map, center) {
 
 // Add message to marker
 
-function attachSecretMessage(marker, secretMessage) {
+function attachSecretMessage(marker, Message) {
   var infowindow = new google.maps.InfoWindow({
-    content: secretMessage
+    content: Message
   });
 
   marker.addListener('click', function() {
