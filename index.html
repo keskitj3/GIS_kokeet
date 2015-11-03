@@ -1,80 +1,469 @@
-<html>
-
+<html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-
-<script src="ext-3.4.0/adapter/ext/ext-base.js" type="text/javascript"></script>
-<script src="ext-3.4.0/ext-all.js"  type="text/javascript"></script>
-<link rel="stylesheet" type="text/css" href="ext-3.4.0/resources/css/ext-all.css"></link>
-
-<script src="openlayers/OpenLayers.js" type="text/javascript"></script>
-
-<script src="geoext/script/GeoExt.js" type="text/javascript"></script>
-
+<title>Switch Feature Visibility by Group, WFS layer</title>
+<link rel="stylesheet" href="../theme/default/style.css" type="text/css" />
+<style type="text/css">
+body{
+    font-family:Arial;
+}
+td{
+    padding:0px;
+}
+#map {
+    width: 600px;
+    height: 400px;
+    border: 1px solid gray;
+}
+#featDesc{
+    padding:0px;
+    valign:center;
+    text-align:center;
+    font-weight:bold;
+    width:100%;
+    height:20px;
+    color:blue;
+    background-color:yellow;
+    border:0px solid blue;
+}
+</style>
+<script src="../lib/OpenLayers2.6.full.js"></script>
+<script type="text/javascript" src="javascript/LayerSwitcherRadioReg.js"></script>
+<script type="text/javascript" src="javascript/counter_group_wfs.js"></script>
 <script type="text/javascript">
 
-Ext.onReady(function() {
+// avoid pink tiles
+OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
+OpenLayers.Util.onImageLoadErrorColor = "transparent";
 
-  var world = new OpenLayers.Layer.WMS(
-     "Global Imagery",
-     "/geoserver/wms/",
-     {layers: "earthgroup"}
-  );
+OpenLayers.Theme   = "../theme/default/style.css";
+OpenLayers.ImgPath     = "../img/";
 
-  var smallworld = new OpenLayers.Layer.Vector(
-      "Small World", {
-      strategies: [new OpenLayers.Strategy.Fixed()],
-      protocol: new OpenLayers.Protocol.WFS({
-             url: "/geoserver/wfs",
-             featureType: "smallworld",
-             featureNS: "http://geoserver.org/earth"
-      })
-  });
+var map, aktLayer, ctrlSelectFeatures;
+OpenLayers.Feature.Vector.style['default']['strokeWidth'] = '2';
 
-  var mapwin = new Ext.Window({
-     title: "GeoExt Map 1",
-     width: 600,
-     height: 400,
-     layout: "fit",
-     items: {
-       xtype: "gx_mappanel",
-       layers: [world, smallworld]
-     }
-  });
+var serverObjtmp = { server:
+[ {
+      "title": "wfs layer 2008",
+      "url": "http://gis.ibbeck.de/ginfo/apps/OLExamples/OL26/examples/styles_unique_with_group_wfs.asp",
+      "mapfile": "",
+      "params": [{
+              "TYPENAME": "LAYER1",
+              "maxfeatures": 800
+          }, {
+              "typename": "LAYER1",
+              "extractAttributes": true,
+              "projection": "EPSG:4326"
+          }],
+      "options": {
+          "isBaseLayer": false,
+          "isVisible": true,
+          "buffer": 1,
+          "opacity": 1
+      },
+      "vendor": {
+          "sid": "WFS_LAYER_2008",
+          "service": "WFS",
+          "aktlayers": "LAYER1",
+          "aktqlayers": "LAYER1",
+          "lyrNames": ["LAYER1", "LAYER2", "LAYER3"],
+          "lyrTitles": ["Polygons", "Lines", "Points"],
+          "lyrVisible": [1, 0, 0],
+          "lyrQueryable": [0, 0, 0]
+      }
+ }]
+};
 
-  var popup;
-  function createPopup(feature) {
-      popup = new GeoExt.Popup({
-             title: "It's a Small World",
-             location: feature,
-             width:200,
-             html: feature.attributes.placename + "<br/>" + feature.attributes.comment + "<br/>" + feature.attributes.year + "<br/>",
-             maximizable: true,
-             collapsible: true
-      });
-      popup.show();
-  }
+function init()
+{
+    map = new OpenLayers.Map('map');
 
-  smallworld.events.on({
-    featureselected: function(e) {
-      createPopup(e.feature);
+    var wmsLayer = new OpenLayers.Layer.WMS(
+        "OpenLayers WMS",
+        "http://labs.metacarta.com/wms/vmap0",
+        {layers: 'basic'}
+    );
+
+
+    var aStyleMap = new OpenLayers.StyleMap({fillColor: 'yellow', fillOpacity: 0.3, strokeWidth: 1.0, strokeColor:'yellow', pointRadius: 10 });
+
+    var lookup = {};
+    lookup['triangle']    = {fillColor: 'red',     fillOpacity: 0.3, strokeWidth: 1.0, strokeColor:'red',  pointRadius: 5 };
+    lookup['square']      = {fillColor: '#FF00FF', fillOpacity: 0.3, strokeWidth: 2.0, strokeColor:'#FF00FF',  pointRadius: 5 };
+    lookup['5 sides']     = {fillColor: 'blue',    fillOpacity: 0.3, strokeWidth: 1.0, strokeColor:'blue', pointRadius: 5 };
+    lookup['hexagon']     = {fillColor: 'green',   fillOpacity: 0.3, strokeWidth: 2.0, strokeColor:'green',  pointRadius: 5 };
+    lookup['marker blue'] = {fillOpacity: 1, pointRadius: 10, externalGraphic: "../img/marker-blue.png"};
+    lookup['marker red']  = {fillOpacity: 1, pointRadius: 10, externalGraphic: "../img/marker.png"};
+
+    aStyleMap.addUniqueValueRules("default", "group", lookup);
+
+    var gmlLayer = new OpenLayers.Layer.GML("GML", "gml/squares_group_4326.xml", {styleMap : aStyleMap})
+    gmlLayer.setVisibility(false);
+
+    map.addLayers([wmsLayer, gmlLayer]);
+    addLayer(serverObjtmp ["server"][0]);
+
+
+    ctrlLayerSwitcher = new OpenLayers.Control.LayerSwitcherRadio();
+    ctrlLayerSwitcher.onChangeActiveLayer =  function () { refreshSpanActiveLayer() };
+    map.addControl(ctrlLayerSwitcher);
+
+    //map.addControl(new OpenLayers.Control.LayerSwitcher());
+    map.addControl(new OpenLayers.Control.MousePosition());
+
+    //GEOMETRYCOLLECTION(POINT(2.7204895015752695 41.738528464592854))
+    map.setCenter(new OpenLayers.LonLat(2.72, 41.74), 10);
+
+    Radio_and_Checkboxes();
+
+    aktLayer = 2; //index of a vectorlayer
+    map.aktLayer = aktLayer;
+
+    ctrlLayerSwitcher.layerStates = [];
+    ctrlLayerSwitcher.redraw();
+
+    refreshSpanActiveLayer();
+    //map.addControl(ctrlSelectFeatures);
+    //ctrlSelectFeatures.activate();
+
+}//end init
+
+//###################################################################################
+// Create Radiobutton and Checkboxe controls
+//###################################################################################
+
+function Radio_and_Checkboxes()
+{
+    var groupArr = ["triangle", "square", "5 sides", "hexagon", "marker blue", "marker red"];
+    var objFs = map.layers[1].features;
+    var theHTML = '';
+    theHTML += '<b>feature visibility</b><br>';
+    for(var i=0;i<groupArr.length;i++)
+        theHTML += '<input id="fVis' + i + '" type="checkbox" checked onclick="changeFeatureVisibility(' + i + ',this.checked)"><label>' + groupArr[i] + '</label><br>';
+
+    theHTML += '<br><b>Popup on select</b><br>';
+    theHTML += '<input type="checkbox" name="popos" checked onclick="aktPopupFlag=this.checked"><Label>show Popups</Label><br>';
+            theHTML += '<input type="checkbox" name="popoOpa" checked onclick="popupOpacity=this.checked"><Label>use opacity</Label><br>';
+    theHTML += '<br><b>Popup Type</b><br>';
+    theHTML += '<input type="radio" name="popType" checked onclick="EditAllAtt=0;"><Label>name and description</Label><br>';
+    theHTML += '<input type="radio" name="popType" onclick="EditAllAtt=1;"><Label>edit name and description</Label><br>';
+    theHTML += '<input type="radio" name="popType" onclick="EditAllAtt=2;"><Label>edit all attributes</Label><br>';
+
+    theHTML += '<br><b>select layers from the WFS server</b><br>';
+    theHTML += '<input type="checkbox" id="wfs1" checked onclick="wfsLyr(1, this.checked)"><Label>Polygons</Label><br>';
+    theHTML += '<input type="checkbox" id="wfs2" onclick="wfsLyr(2, this.checked)"><Label>Lines</Label><br>';
+    theHTML += '<input type="checkbox" id="wfs3" onclick="wfsLyr(3, this.checked)"><Label>Points</Label><br>';
+    theHTML += '<input type="button" name="wfsbtn" value="refresh" onclick="refreshWFS()"><br>';
+
+
+    document.getElementById("diva").innerHTML = theHTML;
+}
+
+var wfsLayersParam;
+var wfsLAYERS = ["LAYER1","LAYER2","LAYER3"];
+function wfsLyr(idx, flag)
+{
+    wfsLayersParam = "";
+    for(var i=0;i<3;i++)
+    {
+        if(document.getElementById("wfs" + (i+1)).checked)
+        wfsLayersParam += wfsLAYERS[i] + ",";
     }
-  });
+    wfsLayersParam = wfsLayersParam.replace(/,$/,"");
+}
 
-  var selectCtrl = new OpenLayers.Control.SelectFeature(smallworld);
+function refreshWFS()
+{
+    regFeatureUnselected();
+    map.layers[2].mergeNewParams({"TYPENAME":wfsLayersParam});
+}
 
-  var mapPanel;
-  mapPanel = mapwin.items.get(0);
-  mapPanel.map.addControl(selectCtrl);
-  selectCtrl.activate();
+var popupOpacity=true;
 
-  mapwin.show();
+//###################################################################################
+// changeFeatureVisibility
+//###################################################################################
 
-});
+function changeFeatureVisibility()
+{
+    var AstyleMap = new OpenLayers.StyleMap({fillColor: 'yellow', fillOpacity: 0.3, strokeWidth: 1.0, strokeColor:'yellow', pointRadius: 10 });
 
+    var lookup = {};
+    for(var i=0;i<6;i++)
+    {
+        var flag = document.getElementById("fVis"+i).checked;
+        if(i==0 && flag)
+            lookup['triangle'] = {fillColor: 'red',     fillOpacity: 0.3, strokeWidth: 1.0, strokeColor:'red',  pointRadius: 5 };
+        else if(i==1 && flag)
+            lookup['square']   = {fillColor: '#FF00FF', fillOpacity: 0.3, strokeWidth: 2.0, strokeColor:'#FF00FF',  pointRadius: 5 };
+        else if(i==2 && flag)
+            lookup['5 sides']   = {fillColor: 'blue',    fillOpacity: 0.3, strokeWidth: 1.0, strokeColor:'blue', pointRadius: 5 };
+        else if(i==3 && flag)
+            lookup['hexagon']  = {fillColor: 'green',   fillOpacity: 0.3, strokeWidth: 2.0, strokeColor:'green',  pointRadius: 5 };
+        else if(i==4 && flag)
+            lookup['marker blue']  = {fillOpacity: 1, pointRadius: 10, externalGraphic: "../img/marker-blue.png"};
+        else if(i==5 && flag)
+            lookup['marker red']  = {fillOpacity: 1, pointRadius: 10, externalGraphic: "../img/marker.png"};
+
+    }
+
+    AstyleMap.addUniqueValueRules("default", "group", lookup);
+    //AstyleMap['select'] = { 'select' : {fillColor: 'yellow', fillOpacity: 0.3, strokeWidth: 1.0, strokeColor:'yellow', pointRadius: 10 }};
+
+    var vlyr = map.layers[1];
+    vlyr.styleMap = AstyleMap;
+
+    var objFs = vlyr.features;
+
+    for(var i=0;i<objFs.length;i++)
+        vlyr.drawFeature(objFs[i]);
+}
+
+//###################################################################################
+// popup start
+//###################################################################################
+
+var MaxSizeAnchoredBubble = OpenLayers.Class(OpenLayers.Popup.AnchoredBubble, {'autoSize': true});
+var aktPopup;
+var aktPopupFlag=true;
+var EditAllAtt=0;
+
+function regFeatureSelected()
+{
+    aktPopup = create_Popup();
+
+    var objF = this.selectedFeatures[0];
+    var desc   = objF.attributes['description'] ? objF.attributes['description'] : (objF.attributes['descriptio'] ? objF.attributes['descriptio'] : "about:blank");
+    if(objF.attributes.group != "5 sides")
+        document.getElementById("featDesc").innerHTML = map.layers[map.aktLayer].name + ", " + objF.attributes.name + ", " + desc;
+    else
+        document.getElementById("featDesc").innerHTML = objF.attributes.name + ", Picture from Wikipedia (Kolkata)";
+}
+
+function regFeatureUnselected()
+{
+    if(aktPopup)
+        map.removePopup(aktPopup.popup);
+
+    document.getElementById("featDesc").innerHTML = map.layers[map.aktLayer].name + ", selected feature description";
+}
+
+function create_Popup()
+{
+    if(aktPopupFlag!=true)
+        return;
+
+    var lyr   = map.layers[map.aktLayer];
+    var objF = lyr.selectedFeatures[0];
+
+    var box = objF.geometry.getBounds();
+    var x = (box.left + box.right)/2;
+    var y = (box.top  + box.bottom)/2;
+
+    var attName  = objF.attributes['name'] ? objF.attributes['name'] : "no attribute 'name'";
+    var attDesc  = objF.attributes['description'] ? objF.attributes['description'] : (objF.attributes['descriptio'] ? objF.attributes['descriptio'] : "no attribute 'description'");
+    var attGroup = objF.attributes['group'] ? objF.attributes['group'] : "no attribute 'description'";
+
+    var theID =  OpenLayers.Util.createUniqueID("fpopup_");
+    var theHTML = '';
+
+    if(EditAllAtt==0)
+    {
+        theHTML += '<table style="background-color:#BBCCFF">';
+        theHTML += '<tr><td><span style="font-size:14px;font-weight:bold;background-color:#BBCCFF">' + attName + '</span><hr>' + attDesc.replace(/img/,"img width='200px'") + '</td></tr></table>';
+    }
+    else if(EditAllAtt>0)
+    {
+        if(EditAllAtt==1)
+            theHTML += '<table style="background-color:#BBFFFF">';
+        else
+            theHTML += '<table style="background-color:#FFCCFF">';
+        theHTML += '<tr><td>name</td>       <td><input id="attName_' + objF.id + '" type="text" style="width:100%" value="' + attName + '"></td></tr>';
+        theHTML += '<tr><td>description</td><td><input id="attDesc_' + objF.id + '" type="text" style="width:100%" value="' + attDesc + '"></td></tr>';
+
+        if(EditAllAtt==2)
+        {
+            for(var key in objF.attributes)
+            {   if(key != "name" && key != "description")
+                theHTML += '<tr><td>' + key + '</td>       <td><input id="att'+key+'_' + objF.id + '" type="text" style="width:100%" value="' + objF.attributes[key] + '"></td></tr>';
+            }
+        }
+
+        theHTML += '<tr><td></td>           <td><input id="attBtn_'  + objF.id + '" type="button" value="Update" onclick="updateAttributes(\'' + objF.id + '\');"></td></tr>';
+        theHTML += '</table>';
+    }
+
+    var ll  = new OpenLayers.LonLat(x, y);
+    var data = {
+        'popupContentHTML' : theHTML,
+        'overflow' : "auto"
+    }
+
+    var f = new OpenLayers.Feature(lyr, ll, data);
+    f.closeBox = false;
+    f.popupClass = MaxSizeAnchoredBubble;
+    f.popup = f.createPopup(f.closeBox);
+    if(popupOpacity) f.popup.opacity=0.9;
+    //f.popup.opacity=0.9;
+
+    if(EditAllAtt==0)
+        f.popup.backgroundColor="#BBCCFF";
+    else if(EditAllAtt==1)
+        f.popup.backgroundColor="#BBFFFF";
+    else if(EditAllAtt==2)
+        f.popup.backgroundColor="#FFCCFF";
+
+    map.addPopup(f.popup);
+
+    return(f);
+}
+
+function updateAttributes(fid)
+{
+    var lyr   = map.layers[map.aktLayer];
+    var objF = lyr.selectedFeatures[0];
+
+    objF.attributes.name        = document.getElementById("attName_" + fid).value;
+    objF.attributes.description = document.getElementById("attDesc_" + fid).value;
+
+    if(EditAllAtt)
+    {
+        for(var key in objF.attributes)
+        {   if(key != "name" && key != "description")
+            {
+                var data = document.getElementById('att' + key + '_' + fid).value;
+
+                if(objF.attributes[key] != data)
+                    objF.attributes[key] = data;
+            }
+        }
+    }
+}
+
+//###################################################################################
+// popup end
+//###################################################################################
+
+// ########################################
+// add layer function
+// ########################################
+
+function addLayer(obj)
+{
+    obj["options"].displayOutsideMaxExtent=true;
+
+    if(obj.vendor.service == "GOOGLE")
+    {   var lyr = new OpenLayers.Layer.Google(obj["title"], obj["options"]);
+        //lyr.service = obj.service;
+        lyr.vendor  = obj["vendor"];
+        map.addLayer(lyr);
+    }
+    else if(obj.vendor.service == "BASELAYER")
+    {
+        var lyr = new OpenLayers.Layer(obj["title"], obj["url"], obj["params"], obj["options"] );
+        lyr.vendor  = obj["vendor"];
+        lyr.setVisibility(lyr.options.isVisible);
+        lyr.isBaseLayer=true;
+        map.addLayer(lyr);
+    }
+    else if(obj.vendor.service == "WFS")
+    {   var lyr = new OpenLayers.Layer.WFS(obj["title"], obj["url"], obj["params"][0], obj["params"][1] );
+        //lyr.service = obj.service;
+        lyr.vendor  = obj["vendor"];
+        lyr.options = obj["options"];
+        lyr.setVisibility(lyr.options.isVisible);
+        map.addLayer(lyr);
+    }
+    else if(obj.vendor.service == "VECTOR")
+    {
+        var lyr = new OpenLayers.Layer.Vector("Editable Vectors");
+        var randomColorStyle = new OpenLayers.Style(OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style["default"]));
+        var selectColorStyle = new OpenLayers.Style(OpenLayers.Util.extend({}, OpenLayers.Feature.Vector.style["select"]));
+
+        try{
+            lyr.styleMap = new OpenLayers.StyleMap({'default':{fillOpacity: 0.5, fillColor: randomColor(128,128,128, 127,127,127), strokeWidth: 3, strokeColor: randomColor(128,128,128, 127,127,127, true), pointRadius: 3}, 'select':{fillOpacity: 0.5, fillColor: 'yellow', strokeWidth: 2, strokeColor: 'yellow', pointRadius: 5}});
+        }catch(err){};
+
+        lyr.options = obj["options"];
+        lyr.vendor  = obj["vendor"];
+        lyr.setVisibility(lyr.options.isVisible);
+        map.addLayer(lyr);
+    }
+    else if(obj.vendor.service == "WMS")
+    {   var lyr = new OpenLayers.Layer.WMS(obj["title"], obj["url"], obj["params"], obj["options"] );
+        //lyr.service = obj.service;
+        lyr.vendor  = obj["vendor"];
+        lyr.vendor.info_format = "text/html";
+        lyr.vendor.feature_count = 1;
+        lyr.setVisibility(lyr.options.isVisible);
+        map.addLayer(lyr);
+    }
+}
+
+function toggleSFcontrol()
+{
+    if(ctrlSelectFeatures)
+    {
+        map.layers[aktLayer].events.unregister('featureselected',   map.layers[aktLayer], regFeatureSelected);
+        map.layers[aktLayer].events.unregister('featureunselected', map.layers[aktLayer], regFeatureUnselected);
+        ctrlSelectFeatures.destroy();
+    }
+
+    if(map.aktLayer!=0)
+    {
+        ctrlSelectFeatures = new OpenLayers.Control.SelectFeature(
+                map.layers[map.aktLayer],
+                {
+                    clickout: true, toggle: false,
+                    multiple: false, hover: false,
+                    toggleKey: "ctrlKey", // ctrl key removes from selection
+                    multipleKey: "shiftKey" // shift key adds to selection
+                }
+        )
+
+        map.addControl(ctrlSelectFeatures);
+        ctrlSelectFeatures.activate();
+
+        map.layers[map.aktLayer].events.register('featureselected',   map.layers[map.aktLayer], regFeatureSelected);
+        map.layers[map.aktLayer].events.register('featureunselected', map.layers[map.aktLayer], regFeatureUnselected);
+
+        console.log("Hallo");
+    }
+}
+
+function refreshSpanActiveLayer()
+{
+    toggleSFcontrol();
+    aktLayer = map.aktLayer;
+    document.getElementById("featDesc").innerHTML = map.layers[map.aktLayer].name;
+}
 </script>
 
 </head>
+<body onload="init()">
 
-<body><!-- Oh no you didn't !!! --></body>
+  <script>
 
+      var LeftText  = "homepage:gis.ibbeck.de";
+      var RightText = "examples:gis.ibbeck.de";
+
+      var LeftLink  = "http://gis.ibbeck.de/ginfo/";
+      var RightLink = "http://gis.ibbeck.de/ginfo/apps/OLExamples/Index/index.html";
+
+      var MiddleText = "&#160;&#160;-&#160;&#160;OpenLayers Examples by gis.ibbeck.de&#160;&#160;-&#160;&#160;";
+
+      document.write('<center><div id="fusszeile" onmouseover="this.style.backgroundColor=\'#CCCCCC\';this.style.opacity=1;" onmouseout="this.style.backgroundColor=\'#CCCCCC\';this.style.opacity=0.25;" style="z-index:9999;cursor:pointer;position:absolute;top:0px;left:0px;width:100%;padding-left:0px;background-color:#CCCCCC;opacity:0.25;font-size: 10px; font-weight: bold;"><a href="' + LeftLink + '">' + LeftText + '<\/a><span style="cursor:default">' + MiddleText + '<\/span><a style="color:blue;cursor:pointer;" href="' + RightLink + '">' + RightText + '<\/a><\/div><\/center>');
+
+  </script>
+
+    <h1 id="title">OpenLayers Switch Features Visibility, OpenLayers WFS layer</h1>
+    <p id="shortdesc">
+        Toggle visibility of features by attribute 'group' (of GML layer).
+        Request one ore more layers from a wfs server.
+    </p>
+    <table>
+    <tr><td><div id="map"></div></td><td valign="top"><div id="diva"></div></td></tr>
+    <tr><td><div id="featDesc">selected feature description</div></td><td></td></tr>
+    </table>
+
+</body>
 </html>
