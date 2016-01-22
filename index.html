@@ -1,15 +1,49 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta name="viewport"></meta>
-<title>Helsingin rakennukset kartalla + metadata - Google Fusion Tables</title>
-<style type="text/css">
-html, body, #googft-mapCanvas {
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  width: 100%;
-}
+<html lang="en-us">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-cabaple" content="yes"> 
+
+    <!-- Bootstarp scriptit -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+   
+    <title>Liikuntapaikat kartalla</title>
+    <style>
+	    html, body, #googft-mapCanvas {
+	overflow:hidden;
+	height:100%;
+	}
+    	    #header {
+	background-color:#FF6600;
+	color:black;
+	text-align:center;
+	font-family: "Lucida Sans Unicode", Lucida Grande, sans-serif;
+	position:absolute;
+	z-index:50;
+	right:0;
+	left:0;
+	top:0;
+	}
+	    #footer {
+	background-color:#FF6600;
+	color:black;
+	clear:both;
+	text-align:left;
+	position:absolute;
+	width:100%;
+	bottom:0;
+	left:0;
+	right:0;
+	}
+	    #map {
+	width:100%;
+	height:100%;
+	position:absolute;
+	left:0;	
+	}
+
 #googft-legend {
   background-color: #fff;
   border: 1px solid #000;
@@ -63,10 +97,146 @@ html, body, #googft-mapCanvas {
   font-size: 11px;
 }
 
-</style>
+
+
+
+
+
+	.btn {
+	  margin:3px;
+	} 
+
+  	.btn-round { 
+	  font-weight: bold;
+	  width: 19px;
+	  height: 19px;
+	  text-align: center;
+	  padding: 1px 0;
+	  font-size: 13px;
+	  line-height: 0.1;
+	  border-radius: 30px;
+	}
+
+/* tarvitaanko tata? 
+	.ol-toggle-options a {
+          background: rgba(255,255,255,0.5);
+          color: white;
+          display: block;
+          font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
+          font-size: 19px;
+          font-weight: bold;
+          height: 18px;
+          line-height: 11px;
+          margin: 1px;
+          padding: 0;
+          text-align: center;
+          text-decoration: none;
+          width: 55px;
+          border-radius: 2px;
+        }
+        .ol-toggle-options a:hover {
+          color: #fff;
+          text-decoration: none;
+          background: rgba(0,60,136,0.7);
+        } */
+
+	.sidebar {
+	position:absolute;
+	top:0; right:0; width:250px;
+ 	bottom:0;
+	overflow-x:auto;
+	background-color:#ffcc00;
+	margin:0;
+	padding:5px;
+	font-size:15px;
+	border-radius:10px;
+	text-align:center;
+	z-index:80;
+	}	
+
+	/* Styles used by the default GetFeatureInfo output, added to make IE happy */
+        table.featureInfo, table.featureInfo td, table.featureInfo th {
+            border: 1px solid #ddd;
+            border-collapse: collapse;
+            margin: 0;
+            padding: 0;
+            font-size: 90%;
+            padding: .2em .1em;
+        }
+        table.featureInfo th {
+            padding: .2em .2em;
+            font-weight: bold;
+            background: #eee;
+        }
+        table.featureInfo td {
+            background: #fff;
+        }
+        table.featureInfo tr.odd td {
+            background: #eee;
+        }
+        table.featureInfo caption {
+            text-align: left;
+            font-size: 100%;
+            font-weight: bold;
+            padding: .2em .2em;
+        }
+
+/* erikokoisten nayttojen erot */
+
+/* pieni naytto */
+ @media screen and (max-width:549px) { 
+	h1{
+        font-size:24px}
+	.ol-toggle-options {
+          z-index: 1000;
+          position:absolute;
+          right: 7px;
+          bottom: 3px;
+	}
+    /* .btn{padding:5px 11px;} */
+	div span:last-of-type {
+        display: block;}
+	}
+
+/* keskikokoinen naytto */
+ @media screen and (min-width: 550px) and (max-width:800px) { 
+	h1{
+        font-size:30px;}
+	.ol-toggle-options {
+          z-index: 1000;
+          position:absolute;
+          right: 10px;
+          bottom: 10px;
+	}
+	}
+/* iso naytto */
+@media screen and (min-width: 801px) { 
+	h1{
+        font-size:36px;}
+	.ol-toggle-options {
+          z-index: 1000;
+          position:absolute;
+          right: 10px;
+          bottom: 15px;
+	}
+	}
+
+    </style>
+  </head>
+
+  <body onload="init()">
+		
+    <!-- OpenLayers scriptit -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="http://openlayers.org/en/v3.11.1/build/ol.js"></script>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.11.1/css/ol.css" type="text/css">
+   
 
 <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&amp;libraries=visualization&amp;sensor=false"></script>
 
+
+
+    <!-- Toiminnallisuus scriptit -->    
 <script type="text/javascript">
   function initialize() {
     google.maps.visualRefresh = true;
@@ -121,7 +291,22 @@ html, body, #googft-mapCanvas {
 
   google.maps.event.addDomListener(window, 'load', initialize);
 </script>
-</head>
+    
+
+<!-- Sivupalkin piilotus -->
+    <script>
+      function toggleControlPanel(){
+        var sidebar = document.getElementById("sidebar");
+        if (sidebar.style.display == "none") {
+          sidebar.style.display = "block";
+        }
+        else {
+          sidebar.style.display = "none";
+        }
+      }
+    </script>
+
+
 
 <body>
   <div id="googft-mapCanvas"></div>
@@ -174,5 +359,113 @@ style="background-color: #4c1130"></span>
     <input id="googft-legend-close" style="display:none" type="button" value="Hide"></input>
   </div>
 
-</body>
+
+    <!-- Header osio, johon tulee otsikko ja ehka joki valikko -->
+    <div class="container-fluid">
+   	<div id="header">
+    	  <h1><span>Liikuntapaikat</span> <span>kartalla</span></h1>
+       
+  	  <div class="ol-toggle-options">  
+	   <button class="btn btn-primary" title="Sivupalkki" onClick="toggleControlPanel()" href="#toggle">Valikko</button>   
+    	  </div>
+	</div>
+    
+
+	<div id='sidebar' class='sidebar' style="display: none;">
+            
+    	<button class="btn btn-primary" title="Sivupalkki" onClick="toggleControlPanel()" href="#toggle">Sulje valikko</button>   
+	<br><br>  	
+   
+	<!--Filtteröinti valikko wfs-->
+	Näytettävät kohteet:
+	<select id="filtering_wfs" onchange="update()">
+          <option value="">Kaikki kohteet</option>
+	  <option value="AND(tyyppikoodi=2120)">Kuntosalit</option>
+          <option value="AND(tyyppikoodi BETWEEN 3000 AND 3999)">Uintikohteet</option>
+	  <option value="AND(tyyppikoodi BETWEEN 2200 AND 2299)">Liikuntahallit</option>
+	  <option value="AND(tyyppikoodi BETWEEN 4000 AND 4999)">Maastoliikuntapaikat</option>  
+        </select>
+
+
+<!--	Näytettävät kohteet:
+	<select id="filtering_wfs" onchange="update()">
+          <option value="">Kaikki kohteet</option>
+	  <option value="&CQL_FILTER=tyyppikoodi= 2120">Kuntosalit</option>
+          <option value="&CQL_FILTER=tyyppikoodi BETWEEN 3000 AND 3999">Uintikohteet</option>
+	  <option value="&CQL_FILTER=tyyppikoodi BETWEEN 4000 AND 4999">Maastoliikuntapaikat</option>  
+        </select>
+-->   
+	<!-- Filtteröinnille valikko wms
+	Näytettävät kohteet:
+	<select id="filtering" onchange="updateFilter(value)">
+            <option value="BETWEEN 0 AND 99999999999999">Kaikki kohteet</option>
+	    <option value="= 2120">Kuntosalit</option>
+            <option value="BETWEEN 3000 AND 3999">Uintikohteet</option>
+        </select>
+-->
+	<br><br>
+    	
+	<!-- Paikannukselle nappula, tällä hetkellä asettaa reitinhaun aloitussijainnin -->
+<!--	<input type="checkbox" name="track" id="track"> Näytä oma sijainti</input>
+	<br> -->
+
+	<button id="track" class="btn btn-primary">Paikanna</button>
+	<button class="btn btn-primary btn-round" onclick="alert('Näyttää nykyisen sijaintisi')">i</button>
+	<br>
+
+	<!-- Painettuna mahdollistaa uuden aloitussijainnin maarittamisen -->
+	<button id="new_start" class="btn btn-primary">Lisää aloitussijainti</button>
+	<button class="btn btn-primary btn-round" onclick="alert('Lisää aloitussijainti navigoinnille.\nKlikkaa ensin Lisää aloitussijainti ja sitten haluamaasi kohtaa kartalla')">i</button>
+	<br>
+	
+	<!-- Navigoi valittuun kohteeeen -->
+	<button id="navigate" class="btn btn-primary">Navigoi kohteeseen</button>
+	<button class="btn btn-primary btn-round" onclick="alert('Näyttää lyhimmän reitin aloitussijainnin ja valitun kohteen välillä')">i</button>
+	<br>
+
+	<!-- Poista haettu reitti -->
+	<button id="clear" class="btn btn-primary">Poista reitti</button>
+	<br><br>
+
+	<!-- Kohteiden haku -->
+	Etsi kohde:
+	<br>
+	<select id="filtering_search">
+          <option value="AND(nimi_fi LIKE ">Nimi</option>
+          <option value="AND(tyyppi_nimi_fi LIKE ">Tyyppi</option>
+        </select>
+        <input type="text" size="15" id="filter"/>
+        <button class="btn btn-primary btn-sm" id="updateFilterButton" href="#" onClick="update()" title="Apply filter">Etsi</button>
+	<button class="btn btn-primary btn-sm" id="resetFilterButton" href="#" onClick="resetFilter()" title="Reset filter">Poista haku</button>
+        
+	<br>		
+	
+	<!-- Wfs-layerin piilottaminen -->
+	<input type="checkbox" id="nappi" checked>Liikuntapaikat 
+	<br><br> 
+
+	<!-- Valitun kohteen tiedot -->
+	<div id="information">
+	  <em>Klikkaa liikuntakohdetta nähdäksesi sen tiedot</em>
+	  &nbsp;
+	</div>
+
+    </div>
+
+    <!-- Lisaa kartan halutulla koolla -->
+    <div class="container-fluid">
+	<div id="map">
+    </div>
+   
+ 
+    <!-- Tahan voidaan laittaa sivun alaosan tietoja, kuten tekijat ja copyright merkinnat -->
+    <div class="container-fluid">
+	<div id="footer">
+    	  <p> GIS Software Development course</p>
+	</div>
+    </div>
+  
+  </body>
 </html>
+
+
