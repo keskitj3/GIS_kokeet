@@ -2,470 +2,473 @@
 <html lang="en-us">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-cabaple" content="yes"> 
-
-    <!-- Bootstarp scriptit -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-   
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <meta name="apple-mobile-web-app-cabaple" content="yes">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>   
     <title>Liikuntapaikat kartalla</title>
+    <script type='text/javascript' src='http://www.openlayers.org/api/OpenLayers.js'>    
+    </script>
     <style>
-	    html, body, #googft-mapCanvas {
-	overflow:hidden;
-	height:100%;
-	}
-    	    #header {
-	background-color:#FF6600;
+	    #header {
+	background-color:#006600;
 	color:black;
 	text-align:center;
-	font-family: "Lucida Sans Unicode", Lucida Grande, sans-serif;
-	position:absolute;
-	z-index:50;
-	right:0;
-	left:0;
-	top:0;
-	}
+	width:100%;
+	padding:5px
+	      	}
+	    #nav {
+	line-height:30px;
+	background-color:green;
+	width:100%;
+	text-align:left;
+	padding:5px;
+		}
 	    #footer {
-	background-color:#FF6600;
+	background-color:#006600;
 	color:black;
 	clear:both;
 	text-align:left;
-	position:absolute;
 	width:100%;
-	bottom:0;
-	left:0;
-	right:0;
-	}
-	    #map {
-	width:100%;
-	height:100%;
-	position:absolute;
-	left:0;	
-	}
-
-#googft-legend {
-  background-color: #fff;
-  border: 1px solid #000;
-  font-family: Arial,sans-serif;
-  font-size: 12px;
-  margin: 5px;
-  padding: 10px 10px 8px;
-}
-
-#googft-legend p {
-  font-weight: bold;
-  margin-top: 0;
-}
-
-#googft-legend div {
-  margin-bottom: 5px;
-}
-
-.googft-legend-swatch {
-  border: 1px solid;
-  float: left;
-  height: 12px;
-  margin-right: 8px;
-  width: 20px;
-}
-
-.googft-legend-range {
-  margin-left: 0;
-}
-
-.googft-dot-icon {
-  margin-right: 8px;
-}
-
-.googft-paddle-icon {
-  height: 24px;
-  left: -8px;
-  margin-right: -8px;
-  position: relative;
-  vertical-align: middle;
-  width: 24px;
-}
-
-.googft-legend-source {
-  margin-bottom: 0;
-  margin-top: 8px;
-}
-
-.googft-legend-source a {
-  color: #666;
-  font-size: 11px;
-}
-
-
-
-
-
-
-	.btn {
-	  margin:3px;
-	} 
-
-  	.btn-round { 
-	  font-weight: bold;
-	  width: 19px;
-	  height: 19px;
-	  text-align: center;
-	  padding: 1px 0;
-	  font-size: 13px;
-	  line-height: 0.1;
-	  border-radius: 30px;
-	}
-
-/* tarvitaanko tata? 
-	.ol-toggle-options a {
-          background: rgba(255,255,255,0.5);
-          color: white;
-          display: block;
-          font-family: 'Lucida Grande',Verdana,Geneva,Lucida,Arial,Helvetica,sans-serif;
-          font-size: 19px;
-          font-weight: bold;
-          height: 18px;
-          line-height: 11px;
-          margin: 1px;
-          padding: 0;
-          text-align: center;
-          text-decoration: none;
-          width: 55px;
-          border-radius: 2px;
-        }
-        .ol-toggle-options a:hover {
-          color: #fff;
-          text-decoration: none;
-          background: rgba(0,60,136,0.7);
-        } */
-
-	.sidebar {
-	position:absolute;
-	top:0; right:0; width:250px;
- 	bottom:0;
-	overflow-x:auto;
-	background-color:#ffcc00;
-	margin:0;
 	padding:5px;
-	font-size:15px;
-	border-radius:10px;
-	text-align:center;
-	z-index:80;
-	}	
-
-	/* Styles used by the default GetFeatureInfo output, added to make IE happy */
-        table.featureInfo, table.featureInfo td, table.featureInfo th {
-            border: 1px solid #ddd;
-            border-collapse: collapse;
-            margin: 0;
-            padding: 0;
-            font-size: 90%;
-            padding: .2em .1em;
-        }
-        table.featureInfo th {
-            padding: .2em .2em;
-            font-weight: bold;
-            background: #eee;
-        }
-        table.featureInfo td {
-            background: #fff;
-        }
-        table.featureInfo tr.odd td {
-            background: #eee;
-        }
-        table.featureInfo caption {
-            text-align: left;
-            font-size: 100%;
-            font-weight: bold;
-            padding: .2em .2em;
-        }
-
-/* erikokoisten nayttojen erot */
-
-/* pieni naytto */
- @media screen and (max-width:549px) { 
-	h1{
-        font-size:24px}
-	.ol-toggle-options {
-          z-index: 1000;
-          position:absolute;
-          right: 7px;
-          bottom: 3px;
-	}
-    /* .btn{padding:5px 11px;} */
-	div span:last-of-type {
-        display: block;}
-	}
-
-/* keskikokoinen naytto */
- @media screen and (min-width: 550px) and (max-width:800px) { 
-	h1{
-        font-size:30px;}
-	.ol-toggle-options {
-          z-index: 1000;
-          position:absolute;
-          right: 10px;
-          bottom: 10px;
-	}
-	}
-/* iso naytto */
-@media screen and (min-width: 801px) { 
-	h1{
-        font-size:36px;}
-	.ol-toggle-options {
-          z-index: 1000;
-          position:absolute;
-          right: 10px;
-          bottom: 15px;
-	}
-	}
+	    	}
+	    #map {
+	height:500px;
+	width:100%;
+		}
 
     </style>
-  </head>
-
-  <body onload="init()">
-		
-    <!-- OpenLayers scriptit -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-    <script src="http://openlayers.org/en/v3.11.1/build/ol.js"></script>
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.11.1/css/ol.css" type="text/css">
-   
-
-<script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?v=3&amp;libraries=visualization&amp;sensor=false"></script>
-
-
-
-    <!-- Toiminnallisuus scriptit -->    
-<script type="text/javascript">
-  function initialize() {
-    google.maps.visualRefresh = true;
-    var isMobile = (navigator.userAgent.toLowerCase().indexOf('android') > -1) ||
-      (navigator.userAgent.match(/(iPod|iPhone|iPad|BlackBerry|Windows Phone|iemobile)/));
-    if (isMobile) {
-      var viewport = document.querySelector("meta[name=viewport]");
-      viewport.setAttribute('content', 'initial-scale=1.0, user-scalable=no');
-    }
-    var mapDiv = document.getElementById('googft-mapCanvas');
-    mapDiv.style.width = isMobile ? '100%' : '100%';
-    mapDiv.style.height = isMobile ? '100%' : '100%';
-    var map = new google.maps.Map(mapDiv, {
-      center: new google.maps.LatLng(60.16199466214881, 24.9424015570944),
-      zoom: 16,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    });
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('googft-legend-open'));
-    map.controls[google.maps.ControlPosition.RIGHT_BOTTOM].push(document.getElementById('googft-legend'));
-
-    layer = new google.maps.FusionTablesLayer({
-      map: map,
-      heatmap: { enabled: false },
-      query: {
-        select: "col21",
-        from: "1Cjp5kwTFW1zb7rCRILUg6PryPwo_9RkkM4kD960",
-        where: ""
-      },
-      options: {
-        styleId: 2,
-        templateId: 2
-      }
-    });
-
-    if (isMobile) {
-      var legend = document.getElementById('googft-legend');
-      var legendOpenButton = document.getElementById('googft-legend-open');
-      var legendCloseButton = document.getElementById('googft-legend-close');
-      legend.style.display = 'none';
-      legendOpenButton.style.display = 'block';
-      legendCloseButton.style.display = 'block';
-      legendOpenButton.onclick = function() {
-        legend.style.display = 'block';
-        legendOpenButton.style.display = 'none';
-      }
-      legendCloseButton.onclick = function() {
-        legend.style.display = 'none';
-        legendOpenButton.style.display = 'block';
-      }
-    }
-  }
-
-  google.maps.event.addDomListener(window, 'load', initialize);
-</script>
     
-
-<!-- Sivupalkin piilotus -->
+    <!-- Tassa scriptissa luodaan kaikki kartassa esiintyvat funktiot ja tyokalut -->
     <script>
-      function toggleControlPanel(){
-        var sidebar = document.getElementById("sidebar");
-        if (sidebar.style.display == "none") {
-          sidebar.style.display = "block";
-        }
-        else {
-          sidebar.style.display = "none";
-        }
+
+      OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";	
+
+      //Luodaan POPUP globaaliksi ja poistetaan vanha popup, jos on olemassa
+      //Koskee vain wms popuppia
+      var POPUP;
+      function deletePopup() {
+	if (! POPUP) return;
+	map.removePopup(POPUP);
+	POPUP.destroy();
+	POPUP = null;
       }
+
+	//Funktio joka muuttaa tason nakyvyyden. Ei toimi viela! 
+/*      function changeVisibility(select) {
+	var s_layer = select.options[select.selectedIndex];
+   	if(s_layer.getVisibility == false) {
+     	s_layer.setVisibility(true);
+      	}
+      	else if (s_layer.getVisibility == true) {
+   	s_layer.setVisibility(false);
+      	}
+      } */
+
+
+      function init() {
+	var wkt = new OpenLayers.Format.WKT();
+	
+      	// Luo kartan, jossa on navigointi mahdollisuus
+      	var map = new OpenLayers.Map("map", 
+		{units:'m',
+		controls: [
+		new OpenLayers.Control.Navigation(),
+		new OpenLayers.Control.Zoom(),//new OpenLayers.Control.PanZoomBar(),
+		new OpenLayers.Control.LayerSwitcher()
+		]
+	});
+	
+	// Lisaa openstreetmapin layeriksi
+	OSMmap = new OpenLayers.Layer.OSM();
+	
+	// Luodaan WMS taso, kutsumalla se geoserverilta. Samalla asetetaan sille halutut parametrit
+	var liikuntapaikat_wms = new OpenLayers.Layer.WMS("Liikuntapaikat WMS", 
+		"http://kartta.hel.fi/ws/geoserver/avoindata/wms",
+		{layers: "WMS:liikuntapaikat",
+		transparent: true,
+		format: 'image/png'},
+		{'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG:900913'});
+	
+	var vaesto_wms = new OpenLayers.Layer.WMS("Vaesto WMS", 
+		"http://130.233.249.20:8080/geoserver/WMS/wms",
+		{layers: "WMS:vaki2014_1km",
+		transparent: true,
+		format: 'image/png'},
+		{'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG:900913'});
+		
+	var vaesto_kp_wms = new OpenLayers.Layer.WMS("Vaesto_kp WMS", 
+		"http://130.233.249.20:8080/geoserver/WMS/wms",
+		{layers: "WMS:vaki2014_1km_kp",
+		transparent: true,
+		format: 'image/png'},
+		{'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG:900913'});
+
+	// liikuntapaikat_wfs tason muotoilu
+	var defStyle1 = {fillColor: "#FF0000"};
+	var style1 = OpenLayers.Util.applyDefaults(defStyle1, OpenLayers.Feature.Vector.style["default"])
+	var kuntosalit = new OpenLayers.StyleMap({"default": style1});
+ 
+	var defStyle2 = {fillColor: "#0000FF"};
+	var style2 = OpenLayers.Util.applyDefaults(defStyle2, OpenLayers.Feature.Vector.style["default"])
+	var uimapaikat = new OpenLayers.StyleMap({"default": style2});
+
+	// Kuntosalit WFS taso
+	var kuntosalit_wfs = new OpenLayers.Layer.Vector("Kuntosalit WFS", {
+		styleMap: kuntosalit,
+		strategies: [new OpenLayers.Strategy.BBOX()],
+		protocol: new OpenLayers.Protocol.WFS({
+			version: "1.1.0",
+			url: "http://130.233.249.20:8080/geoserver/wfs",
+			featurePrefix: "WMS",
+			featureType: "WFS_pisteet",
+			featureNS: "http://130.233.249.20",
+			geometryName: "the_geom",
+			srsName: "EPSG:4326"
+		}),
+		filter: new OpenLayers.Filter.Comparison({
+			type: OpenLayers.Filter.Comparison.EQUAL_TO,
+			property: "tyyppikoodi",
+			value: "2120"
+			})	
+	});
+	// Uimapaikat WFS taso
+	var uimapaikat_wfs = new OpenLayers.Layer.Vector("Uimapaikat WFS", {
+		styleMap: uimapaikat,
+		strategies: [new OpenLayers.Strategy.BBOX()],
+		protocol: new OpenLayers.Protocol.WFS({
+			version: "1.1.0",
+			url: "http://130.233.249.20:8080/geoserver/wfs",
+			featurePrefix: "WMS",
+			featureType: "WFS_pisteet",
+			featureNS: "http://130.233.249.20",
+			geometryName: "the_geom",
+			srsName: "EPSG:4326"
+		}),
+		filter: new OpenLayers.Filter.Comparison({
+			type: OpenLayers.Filter.Comparison.BETWEEN,
+			property: "tyyppikoodi",
+			lowerBoundary: "3000",
+			upperBoundary: "3999"
+			})
+	}); 
+
+	// vaesto_kp_wfs tason muotoilu
+	var defStyle3 = {fillColor: "#000000"};
+	var style3 = OpenLayers.Util.applyDefaults(defStyle3, OpenLayers.Feature.Vector.style["default"])
+	var wfs2 = new OpenLayers.StyleMap({"default": style3});
+
+	var vaesto_kp_wfs = new OpenLayers.Layer.Vector("Vaesto WFS", {
+		styleMap: wfs2,
+		strategies: [new OpenLayers.Strategy.BBOX()],
+		protocol: new OpenLayers.Protocol.WFS({
+			version: "1.1.0",
+			url: "http://130.233.249.20:8080/geoserver/wfs",
+			featurePrefix: "WMS",
+			featureType: "wfs_vaki2014_1km_kp",
+			featureNS: "http://130.233.249.20",
+			geometryName: "the_geom",
+			srsName: "EPSG:4326"})
+		});
+
+	vaesto_kp_wfs.setVisibility(false);
+	
+	// Lisataan aikasemmin luodut tasot kartalle
+	map.addLayers([
+		OSMmap, 
+		liikuntapaikat_wms, 
+		vaesto_wms, 
+		vaesto_kp_wms, 
+		kuntosalit_wfs, 
+		uimapaikat_wfs, 
+		vaesto_kp_wfs]
+	);
+
+	// Asetetaan perusnakyman parametrit eli sijainti ja zoomaus taso
+	var lat = 60.170833;
+	var lon = 24.9375;
+	//var zoom = 14;
+
+	// Kohdistetaan sijainti
+	map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
+	new OpenLayers.Projection("EPSG:4326"),
+	map.getProjectionObject()
+	), 12);
+
+
+
+	// Tehdaan popup, jolla voidaan etsia wms tietoja 
+	// Hakee kaikkien WMS tiedot, jotka on nakyvilla
+	info = new OpenLayers.Control.WMSGetFeatureInfo({
+		url: 'http://130.233.249.20:8080/geoserver/WMS/wms',
+		title: 'Identify features by clicking',
+		queryVisible: true,
+		eventListeners: {
+			getfeatureinfo: function(event) {
+				//if (event.text > 0) {
+					deletePopup();
+					POPUP = new OpenLayers.Popup.FramedCloud(
+						"chicken",
+						map.getLonLatFromPixel(event.xy),
+						null,
+						event.text,
+						null,
+						true
+					);
+					map.addPopup(POPUP);
+				//}
+			
+			}
+		}
+	});
+	map.addControl(info);
+	info.activate();	
+
+
+
+	//wps varten
+	client = new OpenLayers.WPSClient({
+		servers:{
+			opengeo: "http://130.233.249.20:8080/geoserver/wps"
+		}
+	});
+	
+	//tehdaan bufferille oma layer
+	//var buffer = new OpenLayers.Feature.Vector();
+	//attribute = {name: "Bufferi", bar: "foo"};
+	muotoilu = {'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG4326'};
+	var buffer_layer = new OpenLayers.Layer.Vector("Bufferi", muotoilu)
+	map.addLayers([buffer_layer])
+
+
+
+
+	//WFS toimiva popup. Tekee popupin kuntosaleista ja uimapaikoista
+	var controls = {
+		selector: new OpenLayers.Control.SelectFeature([kuntosalit_wfs, uimapaikat_wfs],
+		 { onSelect: createPopup, onUnselect: destroyPopup })
+	};	
+	
+	//tekee popupin ja samalla bufferin sen ymparille
+	function createPopup (feature) {
+		feature.popup = new OpenLayers.Popup.FramedCloud(
+			"pop",
+			feature.geometry.getBounds().getCenterLonLat(),
+			null,
+			'<div>Liikuntapaikka: '+feature.attributes.nimi_fi+'</div>',
+			null,
+			true,
+			function() { controls['selector'].unselectAll(); }
+		);
+		map.addPopup(feature.popup);
+		//kokeillaan voidaanko laittaa wps tanne sisalle
+		buffer = client.getProcess('opengeo', 'JTS:buffer');
+		buffer.execute({
+			inputs: {
+				geom: feature,
+				distance: 10000
+			},
+			success: function(outputs) {
+				//var buffer = new OpenLayers.Feature.Vector(outputs, attribute, muotoilu);
+				//var buffer_layer = new OpenLayers.Layer.Vector("testi")
+				var feature = new OpenLayers.Format.WKT().read(outputs.text)
+				buffer_layer.addFeatures([feature])
+				//map.addLayers([buffer_layer])
+			}
+		});
+		
+	}
+
+	function destroyPopup(feature) {
+		feature.popup.destroy();
+		feature.popup = null;
+	}
+
+	map.addControl(controls['selector']);
+	controls['selector'].activate();
+
+
+
+	// Paikannus napin takana
+	var vector = new OpenLayers.Layer.Vector('Sijainti');
+	map.addLayers([vector]);
+
+	var geolocate = new OpenLayers.Control.Geolocate({
+		bind: false,
+		geolocationOptions: {
+		    enableHighAccuracy: false,
+		    maximumAge: 0,
+		    timeout: 7000
+		}
+	});
+
+	map.addControl(geolocate);
+
+	var firstGeolocation = true;
+	geolocate.events.register("locationupdated", geolocate, function(e) {
+		vector.removeAllFeatures();
+
+		vector.addFeatures([
+		    new OpenLayers.Feature.Vector(
+			e.point,
+			{},
+			{
+			    graphicName: "x",
+			    strokeColor: "#000000",
+			    strokeWidth: 1,
+			    fillColor: "#FF9E00",
+			    fillOpacity: 1,
+			    pointRadius: 7
+			}
+		    )
+		]);
+
+		if (firstGeolocation) {
+		    map.zoomToExtent(vector.getDataExtent());
+		    //pulsate(circle);
+		    firstGeolocation = false;
+		    this.bind = true
+		}
+	});
+
+	geolocate.events.register("locationfailed",this,function() {
+		OpenLayers.Console.log('Location detection failed');
+	});
+
+	document.getElementById('locate').onclick = function () {
+		vector.removeAllFeatures();
+		geolocate.deactivate();
+//		document.getElementById('track').checked = false;
+		geolocate.watch = false;
+		firstGeolocation = true;
+		geolocate.activate();
+	}
+
+/*      saastetaan toistaiseksi, silla saatetaan tarvita ehkapa  
+	document.getElementById('track').onclick = function() {
+		vector.removeAllFeatures();
+		geolocate.deactivate();
+		if (this.checked) {
+		    geolocate.watch = true;
+		    firstGeolocation = true;
+		    geolocate.activate();
+		}
+	};
+
+	document.getElementById('track').checked = false;
+*/	
+
+	//pgRouting
+	var params = {
+  	  LAYERS: 'pgrouting:pgrouting',
+  	  FORMAT: 'image/png'
+	};
+
+	// The "start" and "destination" features.
+	var startPoint = new OpenLayers.Layer.Vector();
+	var destPoint = new OpenLayers.Layer.Vector();
+
+	// The vector layer used to display the "start" and "destination" features.
+	var vectorLayer = new OpenLayers.Layer.Vector({
+    	  features: [startPoint, destPoint]
+	});
+	
+	map.addLayer(vectorLayer);
+
+	// A transform function to convert coordinates from EPSG:3857
+	// to EPSG:4326.
+	var transform = OpenLayers.Projection.transform('EPSG:3857', 'EPSG:4326');
+
+	// Register a map click listener.
+	//map.on('click', function(event) {
+	map.events.register("click", map, function(event) {
+  	  if (startPoint.features.length == null) {
+    	    // First click.
+    	    startPoint.setValue(map.getLonLatFromPixel(event.xy));
+  	  } 
+  	  else if (destPoint.features.length == null) { //destPoint.getGeometry()
+    	    // Second click.
+   	    destPoint.setValue(map.getLonLatFromPixel(event.xy));
+
+	    // Transform the coordinates from the map projection (EPSG:3857)
+    	    // to the server projection (EPSG:4326).
+    	    var startCoord = transform(startPoint.features[0].lat);
+    	    var destCoord = transform(destPoint.features[1].lon);
+    	    var viewparams = [
+      	      'x1:' + startCoord.features[0], 'y1:' + startCoord.features[1],
+      	      'x2:' + destCoord.features[0], 'y2:' + destCoord.features[1]
+    	    ];
+    
+    	    params.viewparams = viewparams.join(';');
+    	    var result = new OpenLayers.Layer.WMS({
+                url: 'http://130.233.249.20:8080/geoserver/pgrouting/wms',
+                options: params
+    	    });
+            
+   	    map.addLayer(result);
+  	  }
+	});
+
+	var clearButton = document.getElementById('clear');
+  	clearButton.addEventListener('click', function(event) {
+  	  // Reset the "start" and "destination" features.
+  	  startPoint = null;
+  	  destPoint = null;
+  	  // Remove the result layer.
+  	  map.removeLayer(result);
+	});
+
+
+     }
     </script>
-
-
-
-<body>
-  <div id="googft-mapCanvas"></div>
-  <input id="googft-legend-open" style="display:none" type="button" value="Legend"></input>
-  <div id="googft-legend">
-    <p id="googft-legend-title">Rakennusvuosi</p>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #ff0000"></span>
-      <span class="googft-legend-range">1700 to 1930</span>
-    </div>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #783f04"></span>
-      <span class="googft-legend-range">1930 to 1950</span>
-    </div>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #ff9900"></span>
-      <span class="googft-legend-range">1950 to 1960</span>
-    </div>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #00ff00"></span>
-      <span class="googft-legend-range">1960 to 1970</span>
-    </div>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #6fa8dc"></span>
-      <span class="googft-legend-range">1970 to 1980</span>
-    </div>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #0b5394"></span>
-      <span class="googft-legend-range">1980 to 1990</span>
-    </div>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #351c75"></span>
-      <span class="googft-legend-range">1990 to 2000</span>
-    </div>
-    <div>
-      <span class="googft-legend-swatch" 
-style="background-color: #4c1130"></span>
-      <span class="googft-legend-range">2000 to 2013</span>
-    </div>
-    <div class="googft-legend-source">
-      <a href="http://www.google.com/fusiontables/DataSource?docid=1Cjp5kwTFW1zb7rCRILUg6PryPwo_9RkkM4kD960" target="_blank"></a>
-    </div>
-    <input id="googft-legend-close" style="display:none" type="button" value="Hide"></input>
-  </div>
-
-
+  </head>
+	
+  <body onload="init()">
+  	
     <!-- Header osio, johon tulee otsikko ja ehka joki valikko -->
     <div class="container-fluid">
    	<div id="header">
-    	  <h1><span>Rakennukset</span> <span>kartalla</span></h1>
-       
-  	  <div class="ol-toggle-options">  
-	   <button class="btn btn-primary" title="Sivupalkki" onClick="toggleControlPanel()" href="#toggle">Valikko</button>   
-    	  </div>
-	</div>
-    
+    		<h1>Liikuntapaikat kartalla</h1>
+    	</div>
+    </div>    
 
-	<div id='sidebar' class='sidebar' style="display: none;">
-            
-    	<button class="btn btn-primary" title="Sivupalkki" onClick="toggleControlPanel()" href="#toggle">Sulje valikko</button>   
-	<br><br>  	
-   
-	<!--Filtteröinti valikko wfs-->
-	Näytettävät kohteet:
-	<select id="filtering_wfs" onchange="update()">
-          <option value="">Kaikki kohteet</option>
-	  <option value="AND(tyyppikoodi=2120)">Kuntosalit</option>
-          <option value="AND(tyyppikoodi BETWEEN 3000 AND 3999)">Uintikohteet</option>
-	  <option value="AND(tyyppikoodi BETWEEN 2200 AND 2299)">Liikuntahallit</option>
-	  <option value="AND(tyyppikoodi BETWEEN 4000 AND 4999)">Maastoliikuntapaikat</option>  
-        </select>
-
-
-<!--	Näytettävät kohteet:
-	<select id="filtering_wfs" onchange="update()">
-          <option value="">Kaikki kohteet</option>
-	  <option value="&CQL_FILTER=tyyppikoodi= 2120">Kuntosalit</option>
-          <option value="&CQL_FILTER=tyyppikoodi BETWEEN 3000 AND 3999">Uintikohteet</option>
-	  <option value="&CQL_FILTER=tyyppikoodi BETWEEN 4000 AND 4999">Maastoliikuntapaikat</option>  
-        </select>
--->   
-	<!-- Filtteröinnille valikko wms
-	Näytettävät kohteet:
-	<select id="filtering" onchange="updateFilter(value)">
-            <option value="BETWEEN 0 AND 99999999999999">Kaikki kohteet</option>
-	    <option value="= 2120">Kuntosalit</option>
-            <option value="BETWEEN 3000 AND 3999">Uintikohteet</option>
-        </select>
+    <!-- Valikkopalkki -->
+    <div class="container-fluid">    
+	<div id="nav">
+	<!-- Tehdaan nappulat paikannukselle ja trackille -->		
+		<button id="locate">Paikanna minut!</button>
+		<button id="clear">clear</button>
+<!--		<input type="checkbox" name="track" id="track">
+		<label for="track">Track my position</label>
 -->
-	<br><br>
-    	
-	<!-- Paikannukselle nappula, tällä hetkellä asettaa reitinhaun aloitussijainnin -->
-<!--	<input type="checkbox" name="track" id="track"> Näytä oma sijainti</input>
-	<br> -->
 
-	<button id="track" class="btn btn-primary">Paikanna</button>
-	<button class="btn btn-primary btn-round" onclick="alert('Näyttää nykyisen sijaintisi')">i</button>
-	<br>
-
-	<!-- Painettuna mahdollistaa uuden aloitussijainnin maarittamisen -->
-	<button id="new_start" class="btn btn-primary">Lisää aloitussijainti</button>
-	<button class="btn btn-primary btn-round" onclick="alert('Lisää aloitussijainti navigoinnille.\nKlikkaa ensin Lisää aloitussijainti ja sitten haluamaasi kohtaa kartalla')">i</button>
-	<br>
-	
-	<!-- Navigoi valittuun kohteeeen -->
-	<button id="navigate" class="btn btn-primary">Navigoi kohteeseen</button>
-	<button class="btn btn-primary btn-round" onclick="alert('Näyttää lyhimmän reitin aloitussijainnin ja valitun kohteen välillä')">i</button>
-	<br>
-
-	<!-- Poista haettu reitti -->
-	<button id="clear" class="btn btn-primary">Poista reitti</button>
-	<br><br>
-
-	<!-- Kohteiden haku -->
-	Etsi kohde:
-	<br>
-	<select id="filtering_search">
-          <option value="AND(nimi_fi LIKE ">Nimi</option>
-          <option value="AND(tyyppi_nimi_fi LIKE ">Tyyppi</option>
-        </select>
-        <input type="text" size="15" id="filter"/>
-        <button class="btn btn-primary btn-sm" id="updateFilterButton" href="#" onClick="update()" title="Apply filter">Etsi</button>
-	<button class="btn btn-primary btn-sm" id="resetFilterButton" href="#" onClick="resetFilter()" title="Reset filter">Poista haku</button>
-        
-	<br>		
-	
-	<!-- Wfs-layerin piilottaminen -->
-	<input type="checkbox" id="nappi" checked>Liikuntapaikat 
-	<br><br> 
-
-	<!-- Valitun kohteen tiedot -->
-	<div id="information">
-	  <em>Klikkaa liikuntakohdetta nähdäksesi sen tiedot</em>
-	  &nbsp;
+	<!-- Luodaan dropdown-valikko karttatasoille -->
+		<select id="layerswitch" name="layer" onchange="changeVisibility">
+			<option value="" selected>Valitse karttatasot</option>
+			<option value="liikuntapaikat_wms">Liikuntapaikat</option>
+			<option value="vaesto_wms">vaesto_wms</option>
+			<option value="vaesto_kp_wms">vaesto_kp_wms</option>
+			<option value="kuntosalit_wfs">Kuntosalit</option>
+			<option value="uimapaikat_wfs">Uimapaikat</option>
+			<option value="vaesto_kp_wfs">vaesto_kp_wfs</option>
+		</select>
 	</div>
-
     </div>
-
+    
     <!-- Lisaa kartan halutulla koolla -->
     <div class="container-fluid">
 	<div id="map">
     </div>
-   
- 
-    <!-- Tahan voidaan laittaa sivun alaosan tietoja, kuten tekijat ja copyright merkinnat -->
-    <div class="container-fluid">
-	<div id="footer">
-    	  <p> GIS Software Development course</p>
-	</div>
-    </div>
-  
+
+    <!-- Sijoittaa sijannin funktiosta sivulle haluttuun paikkaan -->
+    <p id="Location"></p>
+    
+        <!-- Tahan voidaan laittaa sivun alaosan tietoja, kuten tekijat ja copyright merkinnat -->
+   <div class="container-fluid">
+	 <div id="footer">
+    		<h>GIS Software Development course</h>
+    	</div>
+   </div>
+
   </body>
 </html>
-
-
