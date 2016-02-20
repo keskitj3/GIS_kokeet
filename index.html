@@ -1,474 +1,80 @@
 <!DOCTYPE html>
-<html lang="en-us">
+<html>
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <meta name="apple-mobile-web-app-cabaple" content="yes">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>   
-    <title>Liikuntapaikat kartalla</title>
-    <script type='text/javascript' src='http://www.openlayers.org/api/OpenLayers.js'>    
-    </script>
+    <title>Custom Overview Map</title>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.13.1/css/ol.css" type="text/css">
+    <script src="http://openlayers.org/en/v3.13.1/build/ol.js"></script>
     <style>
-	    #header {
-	background-color:#006600;
-	color:black;
-	text-align:center;
-	width:100%;
-	padding:5px
-	      	}
-	    #nav {
-	line-height:30px;
-	background-color:green;
-	width:100%;
-	text-align:left;
-	padding:5px;
-		}
-	    #footer {
-	background-color:#006600;
-	color:black;
-	clear:both;
-	text-align:left;
-	width:100%;
-	padding:5px;
-	    	}
-	    #map {
-	height:500px;
-	width:100%;
-		}
-
-    </style>
-    
-    <!-- Tassa scriptissa luodaan kaikki kartassa esiintyvat funktiot ja tyokalut -->
-    <script>
-
-      OpenLayers.ProxyHost = "/cgi-bin/proxy.cgi?url=";	
-
-      //Luodaan POPUP globaaliksi ja poistetaan vanha popup, jos on olemassa
-      //Koskee vain wms popuppia
-      var POPUP;
-      function deletePopup() {
-	if (! POPUP) return;
-	map.removePopup(POPUP);
-	POPUP.destroy();
-	POPUP = null;
+      .ol-custom-overviewmap,
+      .ol-custom-overviewmap.ol-uncollapsible {
+        bottom: auto;
+        left: auto;
+        right: 0;
+        top: 0;
       }
 
-	//Funktio joka muuttaa tason nakyvyyden. Ei toimi viela! 
-/*      function changeVisibility(select) {
-	var s_layer = select.options[select.selectedIndex];
-   	if(s_layer.getVisibility == false) {
-     	s_layer.setVisibility(true);
-      	}
-      	else if (s_layer.getVisibility == true) {
-   	s_layer.setVisibility(false);
-      	}
-      } */
+      .ol-custom-overviewmap:not(.ol-collapsed)  {
+        border: 1px solid black;
+      }
 
+      .ol-custom-overviewmap .ol-overviewmap-map {
+        border: none;
+        width: 300px;
+      }
 
-      function init() {
-	var wkt = new OpenLayers.Format.WKT();
-	
-      	// Luo kartan, jossa on navigointi mahdollisuus
-      	var map = new OpenLayers.Map("map", 
-		{units:'m',
-		controls: [
-		new OpenLayers.Control.Navigation(),
-		new OpenLayers.Control.Zoom(),//new OpenLayers.Control.PanZoomBar(),
-		new OpenLayers.Control.LayerSwitcher()
-		]
-	});
-	
-	// Lisaa openstreetmapin layeriksi
-	OSMmap = new OpenLayers.Layer.OSM();
-	
-	// Luodaan WMS taso, kutsumalla se geoserverilta. Samalla asetetaan sille halutut parametrit
-	var liikuntapaikat_wms = new OpenLayers.Layer.WMS("Liikuntapaikat WMS", 
-		"http://kartta.hel.fi/ws/geoserver/avoindata/wms",
-		{layers: "WMS:liikuntapaikat",
-		transparent: true,
-		format: 'image/png'},
-		{'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG:900913'});
-	
-	var vaesto_wms = new OpenLayers.Layer.WMS("Vaesto WMS", 
-		"http://130.233.249.20:8080/geoserver/WMS/wms",
-		{layers: "WMS:vaki2014_1km",
-		transparent: true,
-		format: 'image/png'},
-		{'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG:900913'});
-		
-	var vaesto_kp_wms = new OpenLayers.Layer.WMS("Vaesto_kp WMS", 
-		"http://130.233.249.20:8080/geoserver/WMS/wms",
-		{layers: "WMS:vaki2014_1km_kp",
-		transparent: true,
-		format: 'image/png'},
-		{'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG:900913'});
+      .ol-custom-overviewmap .ol-overviewmap-box {
+        border: 2px solid red;
+      }
 
-	// liikuntapaikat_wfs tason muotoilu
-	var defStyle1 = {fillColor: "#FF0000"};
-	var style1 = OpenLayers.Util.applyDefaults(defStyle1, OpenLayers.Feature.Vector.style["default"])
-	var kuntosalit = new OpenLayers.StyleMap({"default": style1});
- 
-	var defStyle2 = {fillColor: "#0000FF"};
-	var style2 = OpenLayers.Util.applyDefaults(defStyle2, OpenLayers.Feature.Vector.style["default"])
-	var uimapaikat = new OpenLayers.StyleMap({"default": style2});
+      .ol-custom-overviewmap:not(.ol-collapsed) button{
+        bottom: auto;
+        left: auto;
+        right: 1px;
+        top: 1px;
+      }
 
-	// Kuntosalit WFS taso
-	var kuntosalit_wfs = new OpenLayers.Layer.Vector("Kuntosalit WFS", {
-		styleMap: kuntosalit,
-		strategies: [new OpenLayers.Strategy.BBOX()],
-		protocol: new OpenLayers.Protocol.WFS({
-			version: "1.1.0",
-			url: "http://130.233.249.20:8080/geoserver/wfs",
-			featurePrefix: "WMS",
-			featureType: "WFS_pisteet",
-			featureNS: "http://130.233.249.20",
-			geometryName: "the_geom",
-			srsName: "EPSG:4326"
-		}),
-		filter: new OpenLayers.Filter.Comparison({
-			type: OpenLayers.Filter.Comparison.EQUAL_TO,
-			property: "tyyppikoodi",
-			value: "2120"
-			})	
-	});
-	// Uimapaikat WFS taso
-	var uimapaikat_wfs = new OpenLayers.Layer.Vector("Uimapaikat WFS", {
-		styleMap: uimapaikat,
-		strategies: [new OpenLayers.Strategy.BBOX()],
-		protocol: new OpenLayers.Protocol.WFS({
-			version: "1.1.0",
-			url: "http://130.233.249.20:8080/geoserver/wfs",
-			featurePrefix: "WMS",
-			featureType: "WFS_pisteet",
-			featureNS: "http://130.233.249.20",
-			geometryName: "the_geom",
-			srsName: "EPSG:4326"
-		}),
-		filter: new OpenLayers.Filter.Comparison({
-			type: OpenLayers.Filter.Comparison.BETWEEN,
-			property: "tyyppikoodi",
-			lowerBoundary: "3000",
-			upperBoundary: "3999"
-			})
-	}); 
-
-	// vaesto_kp_wfs tason muotoilu
-	var defStyle3 = {fillColor: "#000000"};
-	var style3 = OpenLayers.Util.applyDefaults(defStyle3, OpenLayers.Feature.Vector.style["default"])
-	var wfs2 = new OpenLayers.StyleMap({"default": style3});
-
-	var vaesto_kp_wfs = new OpenLayers.Layer.Vector("Vaesto WFS", {
-		styleMap: wfs2,
-		strategies: [new OpenLayers.Strategy.BBOX()],
-		protocol: new OpenLayers.Protocol.WFS({
-			version: "1.1.0",
-			url: "http://130.233.249.20:8080/geoserver/wfs",
-			featurePrefix: "WMS",
-			featureType: "wfs_vaki2014_1km_kp",
-			featureNS: "http://130.233.249.20",
-			geometryName: "the_geom",
-			srsName: "EPSG:4326"})
-		});
-
-	vaesto_kp_wfs.setVisibility(false);
-	
-	// Lisataan aikasemmin luodut tasot kartalle
-	map.addLayers([
-		OSMmap, 
-		liikuntapaikat_wms, 
-		vaesto_wms, 
-		vaesto_kp_wms, 
-		kuntosalit_wfs, 
-		uimapaikat_wfs, 
-		vaesto_kp_wfs]
-	);
-
-	// Asetetaan perusnakyman parametrit eli sijainti ja zoomaus taso
-	var lat = 60.170833;
-	var lon = 24.9375;
-	//var zoom = 14;
-
-	// Kohdistetaan sijainti
-	map.setCenter(new OpenLayers.LonLat(lon, lat).transform(
-	new OpenLayers.Projection("EPSG:4326"),
-	map.getProjectionObject()
-	), 12);
-
-
-
-	// Tehdaan popup, jolla voidaan etsia wms tietoja 
-	// Hakee kaikkien WMS tiedot, jotka on nakyvilla
-	info = new OpenLayers.Control.WMSGetFeatureInfo({
-		url: 'http://130.233.249.20:8080/geoserver/WMS/wms',
-		title: 'Identify features by clicking',
-		queryVisible: true,
-		eventListeners: {
-			getfeatureinfo: function(event) {
-				//if (event.text > 0) {
-					deletePopup();
-					POPUP = new OpenLayers.Popup.FramedCloud(
-						"chicken",
-						map.getLonLatFromPixel(event.xy),
-						null,
-						event.text,
-						null,
-						true
-					);
-					map.addPopup(POPUP);
-				//}
-			
-			}
-		}
-	});
-	map.addControl(info);
-	info.activate();	
-
-
-
-	//wps varten
-	client = new OpenLayers.WPSClient({
-		servers:{
-			opengeo: "http://130.233.249.20:8080/geoserver/wps"
-		}
-	});
-	
-	//tehdaan bufferille oma layer
-	//var buffer = new OpenLayers.Feature.Vector();
-	//attribute = {name: "Bufferi", bar: "foo"};
-	muotoilu = {'opacity': 0.66, 'isBaseLayer': false, 'visibility': false, 'projection': 'EPSG4326'};
-	var buffer_layer = new OpenLayers.Layer.Vector("Bufferi", muotoilu)
-	map.addLayers([buffer_layer])
-
-
-
-
-	//WFS toimiva popup. Tekee popupin kuntosaleista ja uimapaikoista
-	var controls = {
-		selector: new OpenLayers.Control.SelectFeature([kuntosalit_wfs, uimapaikat_wfs],
-		 { onSelect: createPopup, onUnselect: destroyPopup })
-	};	
-	
-	//tekee popupin ja samalla bufferin sen ymparille
-	function createPopup (feature) {
-		feature.popup = new OpenLayers.Popup.FramedCloud(
-			"pop",
-			feature.geometry.getBounds().getCenterLonLat(),
-			null,
-			'<div>Liikuntapaikka: '+feature.attributes.nimi_fi+'</div>',
-			null,
-			true,
-			function() { controls['selector'].unselectAll(); }
-		);
-		map.addPopup(feature.popup);
-		//kokeillaan voidaanko laittaa wps tanne sisalle
-		buffer = client.getProcess('opengeo', 'JTS:buffer');
-		buffer.execute({
-			inputs: {
-				geom: feature,
-				distance: 10000
-			},
-			success: function(outputs) {
-				//var buffer = new OpenLayers.Feature.Vector(outputs, attribute, muotoilu);
-				//var buffer_layer = new OpenLayers.Layer.Vector("testi")
-				var feature = new OpenLayers.Format.WKT().read(outputs.text)
-				buffer_layer.addFeatures([feature])
-				//map.addLayers([buffer_layer])
-			}
-		});
-		
-	}
-
-	function destroyPopup(feature) {
-		feature.popup.destroy();
-		feature.popup = null;
-	}
-
-	map.addControl(controls['selector']);
-	controls['selector'].activate();
-
-
-
-	// Paikannus napin takana
-	var vector = new OpenLayers.Layer.Vector('Sijainti');
-	map.addLayers([vector]);
-
-	var geolocate = new OpenLayers.Control.Geolocate({
-		bind: false,
-		geolocationOptions: {
-		    enableHighAccuracy: false,
-		    maximumAge: 0,
-		    timeout: 7000
-		}
-	});
-
-	map.addControl(geolocate);
-
-	var firstGeolocation = true;
-	geolocate.events.register("locationupdated", geolocate, function(e) {
-		vector.removeAllFeatures();
-
-		vector.addFeatures([
-		    new OpenLayers.Feature.Vector(
-			e.point,
-			{},
-			{
-			    graphicName: "x",
-			    strokeColor: "#000000",
-			    strokeWidth: 1,
-			    fillColor: "#FF9E00",
-			    fillOpacity: 1,
-			    pointRadius: 7
-			}
-		    )
-		]);
-
-		if (firstGeolocation) {
-		    map.zoomToExtent(vector.getDataExtent());
-		    //pulsate(circle);
-		    firstGeolocation = false;
-		    this.bind = true
-		}
-	});
-
-	geolocate.events.register("locationfailed",this,function() {
-		OpenLayers.Console.log('Location detection failed');
-	});
-
-	document.getElementById('locate').onclick = function () {
-		vector.removeAllFeatures();
-		geolocate.deactivate();
-//		document.getElementById('track').checked = false;
-		geolocate.watch = false;
-		firstGeolocation = true;
-		geolocate.activate();
-	}
-
-/*      saastetaan toistaiseksi, silla saatetaan tarvita ehkapa  
-	document.getElementById('track').onclick = function() {
-		vector.removeAllFeatures();
-		geolocate.deactivate();
-		if (this.checked) {
-		    geolocate.watch = true;
-		    firstGeolocation = true;
-		    geolocate.activate();
-		}
-	};
-
-	document.getElementById('track').checked = false;
-*/	
-
-	//pgRouting
-	var params = {
-  	  LAYERS: 'pgrouting:pgrouting',
-  	  FORMAT: 'image/png'
-	};
-
-	// The "start" and "destination" features.
-	var startPoint = new OpenLayers.Layer.Vector();
-	var destPoint = new OpenLayers.Layer.Vector();
-
-	// The vector layer used to display the "start" and "destination" features.
-	var vectorLayer = new OpenLayers.Layer.Vector({
-    	  features: [startPoint, destPoint]
-	});
-	
-	map.addLayer(vectorLayer);
-
-	// A transform function to convert coordinates from EPSG:3857
-	// to EPSG:4326.
-	var transform = OpenLayers.Projection.transform('EPSG:3857', 'EPSG:4326');
-
-	// Register a map click listener.
-	//map.on('click', function(event) {
-	map.events.register("click", map, function(event) {
-  	  if (startPoint.features.length == null) {
-    	    // First click.
-    	    startPoint.setValue(map.getLonLatFromPixel(event.xy));
-  	  } 
-  	  else if (destPoint.features.length == null) { //destPoint.getGeometry()
-    	    // Second click.
-   	    destPoint.setValue(map.getLonLatFromPixel(event.xy));
-
-	    // Transform the coordinates from the map projection (EPSG:3857)
-    	    // to the server projection (EPSG:4326).
-    	    var startCoord = transform(startPoint.features[0].lat);
-    	    var destCoord = transform(destPoint.features[1].lon);
-    	    var viewparams = [
-      	      'x1:' + startCoord.features[0], 'y1:' + startCoord.features[1],
-      	      'x2:' + destCoord.features[0], 'y2:' + destCoord.features[1]
-    	    ];
-    
-    	    params.viewparams = viewparams.join(';');
-    	    var result = new OpenLayers.Layer.WMS({
-                url: 'http://130.233.249.20:8080/geoserver/pgrouting/wms',
-                options: params
-    	    });
-            
-   	    map.addLayer(result);
-  	  }
-	});
-
-	var clearButton = document.getElementById('clear');
-  	clearButton.addEventListener('click', function(event) {
-  	  // Reset the "start" and "destination" features.
-  	  startPoint = null;
-  	  destPoint = null;
-  	  // Remove the result layer.
-  	  map.removeLayer(result);
-	});
-
-
-     }
-    </script>
+      .ol-rotate {
+        top: 170px;
+        right: 0;
+      }
+    </style>
   </head>
-	
-  <body onload="init()">
-  	
-    <!-- Header osio, johon tulee otsikko ja ehka joki valikko -->
-    <div class="container-fluid">
-   	<div id="header">
-    		<h1>Liikuntapaikat kartalla</h1>
-    	</div>
-    </div>    
+  <body>
+    <div id="map" class="map"></div>
+    <script>
+      var overviewMapControl = new ol.control.OverviewMap({
+        // see in overviewmap-custom.html to see the custom CSS used
+        className: 'ol-overviewmap ol-custom-overviewmap',
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM({
+              'url': 'http://{a-c}.tile.opencyclemap.org/cycle/{z}/{x}/{y}.png'
+            })
+          })
+        ],
+        collapseLabel: '\u00BB',
+        label: '\u00AB',
+        collapsed: false
+      });
 
-    <!-- Valikkopalkki -->
-    <div class="container-fluid">    
-	<div id="nav">
-	<!-- Tehdaan nappulat paikannukselle ja trackille -->		
-		<button id="locate">Paikanna minut!</button>
-		<button id="clear">clear</button>
-<!--		<input type="checkbox" name="track" id="track">
-		<label for="track">Track my position</label>
--->
-
-	<!-- Luodaan dropdown-valikko karttatasoille -->
-		<select id="layerswitch" name="layer" onchange="changeVisibility">
-			<option value="" selected>Valitse karttatasot</option>
-			<option value="liikuntapaikat_wms">Liikuntapaikat</option>
-			<option value="vaesto_wms">vaesto_wms</option>
-			<option value="vaesto_kp_wms">vaesto_kp_wms</option>
-			<option value="kuntosalit_wfs">Kuntosalit</option>
-			<option value="uimapaikat_wfs">Uimapaikat</option>
-			<option value="vaesto_kp_wfs">vaesto_kp_wfs</option>
-		</select>
-	</div>
-    </div>
-    
-    <!-- Lisaa kartan halutulla koolla -->
-    <div class="container-fluid">
-	<div id="map">
-    </div>
-
-    <!-- Sijoittaa sijannin funktiosta sivulle haluttuun paikkaan -->
-    <p id="Location"></p>
-    
-        <!-- Tahan voidaan laittaa sivun alaosan tietoja, kuten tekijat ja copyright merkinnat -->
-   <div class="container-fluid">
-	 <div id="footer">
-    		<h>GIS Software Development course</h>
-    	</div>
-   </div>
-
+      var map = new ol.Map({
+        controls: ol.control.defaults().extend([
+          overviewMapControl
+        ]),
+        interactions: ol.interaction.defaults().extend([
+          new ol.interaction.DragRotateAndZoom()
+        ]),
+        layers: [
+          new ol.layer.Tile({
+            source: new ol.source.OSM()
+          })
+        ],
+        target: 'map',
+        view: new ol.View({
+          center: [500000, 6000000],
+          zoom: 7
+        })
+      });
+    </script>
   </body>
 </html>
