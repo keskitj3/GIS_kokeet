@@ -9,6 +9,10 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    
+      	    <!-- OpenLayers scriptit -->
+    <script src="http://openlayers.org/en/v3.11.1/build/ol.js"></script>
+    <link rel="stylesheet" href="http://openlayers.org/en/v3.11.1/css/ol.css" type="text/css">
 
     <title>Liikuntapaikat kartalla</title>
 
@@ -117,9 +121,7 @@
     </style>
   </head>
   <body>
-  	    <!-- OpenLayers scriptit -->
-    <script src="http://openlayers.org/en/v3.11.1/build/ol.js"></script>
-    <link rel="stylesheet" href="http://openlayers.org/en/v3.11.1/css/ol.css" type="text/css">
+
     <div id="map" class="map"></div>
     <script>
       var overviewMapControl = new ol.control.OverviewMap({
